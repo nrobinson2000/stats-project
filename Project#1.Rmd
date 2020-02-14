@@ -1,0 +1,26 @@
+---
+title: "Project#1"
+author: "Regression"
+date: "02/19/2020"
+output:
+  pdf_document: default
+---
+
+This is a group project, and students should work in a group of size 3. Include all the R code, hypothesis testing, one or two lines of explanation for any output. The report should be organized, printed,and stapled. The due data of this project is $\textbf{Wednesday } 02/19/2020.$ 
+
+The 2008Movies file contains data on movies released in 2008.
+\begin{itemize}
+\item Calculate a regression modelto predict box office from run time. Interpret the $R^2$ value and test statistic for the slope in the context of this problem.
+\item Create indicator variables for the genre and MPAA ratting.Use the best subsets regression to determine a appropriate regression model
+\begin{itemize}
+\item Validate the model assumptions.
+\item Look at residual plots and check for heteroskedasticity (unequal variance), multicollinearity, correlation of errors, and outliers. Transform the data if it is appropriate.
+\item Submit your suggested least squares regression formula along with a limited number of appropriate graphs that provide justification for your model. Describe why you believe this model is the best.
+\item Test the overall model adequcy. 
+\end{itemize}
+\item Conduct an extra sum of squares test to determine if one or more interaction terms (or quadratic terms) should be included in the model. You can choose any other terms to test. 
+\item Test whether average run time is the same for different Genre. Clearly show your hypothesis test. 
+\item Check equality of variance of run time for Genre type. 
+
+
+\end{itemize}
