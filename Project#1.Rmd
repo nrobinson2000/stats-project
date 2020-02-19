@@ -1,24 +1,49 @@
 ---
 title: "Project#1"
-author: "Regression"
+author: "Nathan Robinson, ..."
 date: "02/19/2020"
 output:
   pdf_document: default
 ---
 
-This is a group project, and students should work in a group of size 3. Include all the R code, hypothesis testing, one or two lines of explanation for any output. The report should be organized, printed,and stapled. The due data of this project is $\textbf{Wednesday } 02/19/2020.$ 
+# Regression
+
+This is a group project, and students should work in a group of size 3. Include all the R code, hypothesis testing, one or two lines of explanation for any output. The report should be organized, printed,and stapled. The due date of this project is $\textbf{Wednesday } 02/19/2020.$ 
 
 ```{r}
 Movies = read.csv("C3 2008Movies.csv")
-
 ```
 
 The 2008Movies file contains data on movies released in 2008.
 
-1. Calculate a regression modelto predict box office from run time. Interpret the $R^2$ value and test statistic for the slope in the context of this problem.
+1. Calculate a regression model to predict box office from run time. Interpret the $R^2$ value and test statistic for the slope in the context of this problem.
+
+```{r}
+M1 = lm(BoxOfficeGross~RunTime, data=Movies)
+summary(M1)
+
+plot(resid(M1))
+
+qqnorm(resid(M1))
+qqline(resid(M1))
+```
 
 
-2. Create indicator variables for the genre and MPAA ratting.Use the best subsets regression to determine a appropriate regression model
+2. Create indicator variables for the genre and MPAA rating. Use the best subsets regression to determine a appropriate regression model.
+
+```{r}
+Genre = as.numeric(Movies$Genre)
+MPAA = as.numeric(Movies$MPAA)
+
+library("leaps")
+Model_subset = regsubsets(BoxOfficeGross~Genre + MPAA, data=Movies)
+summary(Model_subset)
+
+# We want row 8
+# GenreComedy + GenreConcert/Performance + GenreDocumentary + GenreDrama + GenreHorror + GenreRomantic Comedy + GenreThriller/Suspense + MPAAR
+
+```
+
 
     a. Validate the model assumptions.
 
