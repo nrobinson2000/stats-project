@@ -2,8 +2,7 @@
 title: "Project#1"
 author: "Nathan Robinson, ..."
 date: "02/19/2020"
-output:
-  pdf_document: default
+output: pdf_document
 ---
 
 # Regression
@@ -29,7 +28,7 @@ qqline(resid(M1))
 ```
 
 
-2. Create indicator variables for the genre and MPAA rating. Use the best subsets regression to determine a appropriate regression model.
+2. Create indicator variables for the genre and MPAA rating. Use the best subsets regression to determine a appropriate regression model.  
 
 ```{r}
 Genre1 = as.numeric(Movies$Genre)
@@ -57,16 +56,47 @@ summary(Model_full)
 Model_best = lm(BoxOfficeGross~Comedy  + Documentary + Drama + Thriller + MPAAR, data=Movies)
 summary(Model_best)
 
+genreslist = cbind(cbind(cbind(Comedy, Documentary), Drama), Thriller)
+Movies = cbind(cbind(Movies, genreslist), MPAAR)
+
 # plot(predict(Model_best))
 # plot(resid(Model_best))
 ```
+a. Validate the model assumptions.  
+    \indent There is a linear relationship.  By examining the coefficient of determination, it can be seen that there is no linear relationship.  
+    \indent Multivariate normality.  
+    ```{r}
+    boxplot(Movies$BoxOfficeGross~Movies$Genre)
+    boxplot(Movies$BoxOfficeGross~Movies$MPAA)
+    ```
+    By examining the boxplots, it can be seen that there is not multivariate normality.  
+    \indent Little or no multicolinearity  
+    ```{r}
+    library(mctest)
+    imcdata = data.matrix(Movies[19:23])
+    imcdiag(x = imcdata, y = Movies$BoxOfficeGross)
+    ```
+    Given the F-G test, GenreComedy, GenreDrama, and GenreThriller/Suspense are all sources of multicollinearity.  
+    \indent Variance of error terms are similar.  
+    ```{r}
+    plot(residuals(Model_best)~predict(Model_best))
+    abline(lm(residuals(Model_best)~predict(Model_best)))
+    ```
+    Given a plot of residuals vs predicted values, it appears that the error terms are similar and variance is not affected by how large a predicted value is.  
 
+b. Look at residual plots and check for heteroskedasticity (unequal variance), multicollinearity, correlation of errors, and outliers. Transform the data if it is appropriate.  
+    ```{r}
+    plot(Model_best)
+    summary(lm(residuals(Model_best)~predict(Model_best)))
+    boxplot(residuals(Model_best))
+    ```
+    \indent Heteroskedasticity: It was found in part a that the variance is equal, and the Residual vs. Fitted plot further shows that this is true.  
+    \indent Multicollinearity: It was found in part a that there are some terms which cause multicollinearity, further shown in the residual plots.  
+    \indent Correlation of Errors: It was found that there is no correlation for errors, given the summary statistics for the linear model for residuals vs. predicted values.  
+    \indent Outliers: Given the boxplot, it appears that there are quite a few outliers in the data in terms of residuals.  
+    \indent Transformation: Given that the independent variables in this case were all 0 or 1, it was found that most transformations would yield little to no result.  
 
-    a. Validate the model assumptions.
-
-    b. Look at residual plots and check for heteroskedasticity (unequal variance), multicollinearity, correlation of errors, and outliers. Transform the data if it is appropriate.
-
-    c. submit your suggested least squares regression formula along with a limited number of appropriate graphs that provide justification for your model. Describe why you believe this model is the best.
+c. submit your suggested least squares regression formula along with a limited number of appropriate graphs that provide justification for your model. Describe why you believe this model is the best.  
     
 $$BoxOfficeGross = 82953286 -23261221 (Comedy) -53919296 (Documentary) -40706552 (Drama) -31181374 (Thriller) + -22013000 (MPAAR)$$
 
