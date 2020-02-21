@@ -1,6 +1,6 @@
 ---
 title: "Project#1"
-author: "Nathan Robinson, ..."
+author: "AJ Liberatore, Nathan Robinson, Reilly LeBlanc"
 date: "02/19/2020"
 output: pdf_document
 ---
