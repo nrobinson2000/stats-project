@@ -94,13 +94,29 @@ b. Look at residual plots and check for heteroskedasticity (unequal variance), m
     \indent Multicollinearity: It was found in part a that there are some terms which cause multicollinearity, further shown in the residual plots.  
     \indent Correlation of Errors: It was found that there is no correlation for errors, given the summary statistics for the linear model for residuals vs. predicted values.  
     \indent Outliers: Given the boxplot, it appears that there are quite a few outliers in the data in terms of residuals.  
-    \indent Transformation: Given that the independent variables in this case were all 0 or 1, it was found that most transformations would yield little to no result.  
+    \indent Transformation: Given that the independent variables in this case were all 0 or 1, it was found that most transformations would yield little to no result. However, a log transform of the response variable will result in a slightly better model. The new model is shown below:  
+    ```{r}
+    Model_best2 = lm(log(BoxOfficeGross)~Comedy  + Documentary + Drama + Thriller + MPAAR, data=Movies)
+    summary(Model_best2)
+    ```
 
 c. submit your suggested least squares regression formula along with a limited number of appropriate graphs that provide justification for your model. Describe why you believe this model is the best.  
-    
-$$BoxOfficeGross = 82953286 -23261221 (Comedy) -53919296 (Documentary) -40706552 (Drama) -31181374 (Thriller) + -22013000 (MPAAR)$$
 
-    d. Test the overall model adequacy. 
+The best least squares regression formula is as follows:      
+$$log(BoxOfficeGross) = 17.7376 - 0.4223(Comedy) - 1.1104(Documentary) - 0.8001(Drama) - 0.3282(Thriller) - 0.4452(MPAAR)$$  
+This model is better than the previous model, given a higher coefficient of determination and more normal of a residual distribution.  
+```{r}
+plot(Model_best2)
+boxplot(residuals(Model_best2))
+```
+The qq-plot specifically shows normal residual distribution, and the variance of the residuals does not increase given an increase in the predicted value. A boxplot further proves this, given the shape of the boxplot and the fact that there are no outliers.    
+
+d. Test the overall model adequacy.  
+```{r}
+
+```
+Overall, this model is more adequate than the previous one, but that doesn't say much given a very small $R^2$ value, which was 0.1259. Though residuals are now normally distributed, not much of a difference is made in terms of model adequacy.
+
 
 3. Conduct an extra sum of squares test to determine if one or more interaction terms (or quadratic terms) should be included in the model. You can choose any other terms to test.
 
