@@ -116,7 +116,7 @@ With a p-value of $5.51\times10^{-12}$ we have suffecint evidence to reject the 
 \vskip 1ex
 Using Barlett's test with $H_0: \sigma^2_1 = \sigma^2_2 = \sigma^2_3 = \sigma^2_4 = \sigma^2_5 = \sigma^2_6 = \sigma^2_7 = \sigma^2_8 = \sigma^2_9$ and $H_a: \sigma^2_i$ are not all equal.
 ```{r}
-Movies2 = Movies[-8,] # We must ommit the western movie because it is the only oberservation
+Movies2 = Movies[-8,] # We must omit the western movie because it is the only oberservation for that genre.
 bartlett.test(RunTime~Genre, data = Movies2)
 ```
 With a p-value of $2.967\times10^{-7}$ we have suffecint evidence to reject the null hypothesis and conclude that the varience in runtime for differnet movie genres is not the same. 
