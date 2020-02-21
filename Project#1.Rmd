@@ -1,13 +1,14 @@
 ---
 title: "Project#1"
 author: "AJ Liberatore, Nathan Robinson, Reilly LeBlanc"
-date: "02/19/2020"
+date: "02/21/2020"
 output: pdf_document
 ---
 
-# Regression
+Regression
+===
 
-This is a group project, and students should work in a group of size 3. Include all the R code, hypothesis testing, one or two lines of explanation for any output. The report should be organized, printed, and stapled. The due date of this project is $\textbf{Wednesday } 02/19/2020.$ 
+This is a group project, and students should work in a group of size 3. Include all the R code, hypothesis testing, one or two lines of explanation for any output. The report should be organized, printed, and stapled. The due date of this project is $\textbf{Friday } 02/21/2020.$ 
 
 ```{r}
 Movies = read.csv("C3 2008Movies.csv")
@@ -20,15 +21,11 @@ The 2008Movies file contains data on movies released in 2008.
 ```{r}
 M1 = lm(BoxOfficeGross~RunTime, data=Movies)
 summary(M1)
-
-plot(resid(M1))
-
-qqnorm(resid(M1))
-qqline(resid(M1))
 ```
 
+Because the $R^2$ value of 0.02137 is low, the model is not very accurate, even though the p-value of 0.03601 suggests that the model is statistically significant.
 
-2. Create indicator variables for the genre and MPAA rating. Use the best subsets regression to determine a appropriate regression model.  
+2. Create indicator variables for the genre and MPAA rating. Use the best subsets regression to determine an appropriate regression model.  
 
 ```{r}
 Genre1 = as.numeric(Movies$Genre)
@@ -37,9 +34,6 @@ MPAA = as.numeric(Movies$MPAA)
 library("leaps")
 Model_subset = regsubsets(BoxOfficeGross~Genre + MPAA, data=Movies)
 summary(Model_subset)
-
-# We want row 8
-# GenreComedy + GenreConcert/Performance + GenreDocumentary + GenreDrama + GenreHorror + GenreRomantic Comedy + GenreThriller/Suspense + MPAAR
 
 Comedy = as.numeric(Movies$Genre == "Comedy")
 Concert = as.numeric(Movies$Genre == "Concert/Performance")
@@ -50,73 +44,91 @@ RomCom = as.numeric(Movies$Genre == "Romantic Comedy")
 Thriller = as.numeric(Movies$Genre == "Thriller/Suspense")
 MPAAR = as.numeric(Movies$MPAA == "R")
 
-Model_full= lm(BoxOfficeGross~Comedy  + Documentary + Drama + Horror + RomCom + Thriller + MPAAR, data=Movies)
+Model_full= lm(BoxOfficeGross~Comedy + Documentary + Drama + Horror + RomCom + Thriller + MPAAR,
+data=Movies)
 summary(Model_full)
 
-Model_best = lm(BoxOfficeGross~Comedy  + Documentary + Drama + Thriller + MPAAR, data=Movies)
+Model_best = lm(BoxOfficeGross~Comedy + Documentary + Drama + Thriller + MPAAR, data=Movies)
 summary(Model_best)
 
 genreslist = cbind(cbind(cbind(Comedy, Documentary), Drama), Thriller)
 Movies = cbind(cbind(Movies, genreslist), MPAAR)
-
-# plot(predict(Model_best))
-# plot(resid(Model_best))
 ```
 a. Validate the model assumptions.  
-    \indent There is a linear relationship.  By examining the coefficient of determination, it can be seen that there is no linear relationship.  
-    \indent Multivariate normality.  
-    ```{r}
-    boxplot(Movies$BoxOfficeGross~Movies$Genre)
-    boxplot(Movies$BoxOfficeGross~Movies$MPAA)
-    ```
-    By examining the boxplots, it can be seen that there is not multivariate normality.  
-    \indent Little or no multicolinearity  
-    ```{r}
-    library(mctest)
-    imcdata = data.matrix(Movies[19:23])
-    imcdiag(x = imcdata, y = Movies$BoxOfficeGross)
-    ```
-    Given the F-G test, GenreComedy, GenreDrama, and GenreThriller/Suspense are all sources of multicollinearity.  
-    \indent Variance of error terms are similar.  
-    ```{r}
-    plot(residuals(Model_best)~predict(Model_best))
-    abline(lm(residuals(Model_best)~predict(Model_best)))
-    ```
-    Given a plot of residuals vs predicted values, it appears that the error terms are similar and variance is not affected by how large a predicted value is.  
+
+### Linear Relationship
+
+By examining the coefficient of determination, it can be seen that there is no linear relationship.  
+        
+### Multivariate Normality.
+
+```{r}
+boxplot(Movies$BoxOfficeGross~Movies$Genre)
+boxplot(Movies$BoxOfficeGross~Movies$MPAA)
+```
+
+By examining the boxplots, it can be seen that there is not multivariate normality.  
+
+### Little or no Multicolinearity  
+
+```{r}
+library(mctest)
+imcdata = data.matrix(Movies[19:23])
+imcdiag(x = imcdata, y = Movies$BoxOfficeGross)
+```
+   
+Given the F-G test, GenreComedy, GenreDrama, and GenreThriller/Suspense are all sources of multicollinearity.  
+    
+### Variance of error terms are similar
+    
+```{r}
+plot(residuals(Model_best)~predict(Model_best))
+abline(lm(residuals(Model_best)~predict(Model_best)))
+```
+
+Given a plot of residuals vs predicted values, it appears that the error terms are similar and variance is not affected by how large a predicted value is.  
 
 b. Look at residual plots and check for heteroskedasticity (unequal variance), multicollinearity, correlation of errors, and outliers. Transform the data if it is appropriate.  
-    ```{r}
-    plot(Model_best)
-    summary(lm(residuals(Model_best)~predict(Model_best)))
-    boxplot(residuals(Model_best))
-    ```
-    \indent Heteroskedasticity: It was found in part a that the variance is equal, and the Residual vs. Fitted plot further shows that this is true.  
-    \indent Multicollinearity: It was found in part a that there are some terms which cause multicollinearity, further shown in the residual plots.  
-    \indent Correlation of Errors: It was found that there is no correlation for errors, given the summary statistics for the linear model for residuals vs. predicted values.  
-    \indent Outliers: Given the boxplot, it appears that there are quite a few outliers in the data in terms of residuals.  
-    \indent Transformation: Given that the independent variables in this case were all 0 or 1, it was found that most transformations would yield little to no result. However, a log transform of the response variable will result in a slightly better model. The new model is shown below:  
-    ```{r}
-    Model_best2 = lm(log(BoxOfficeGross)~Comedy  + Documentary + Drama + Thriller + MPAAR, data=Movies)
-    summary(Model_best2)
-    ```
+```{r}
+plot(Model_best)
+summary(lm(residuals(Model_best)~predict(Model_best)))
+boxplot(residuals(Model_best))
+```
 
-c. submit your suggested least squares regression formula along with a limited number of appropriate graphs that provide justification for your model. Describe why you believe this model is the best.  
+**Heteroskedasticity:** It was found in part a that the variance is equal, and the Residual vs. Fitted plot further shows that this is true.  
+
+**Multicollinearity:** It was found in part a that there are some terms which cause multicollinearity, further shown in the residual plots. 
+
+**Correlation of Errors:** It was found that there is no correlation for errors, given the summary statistics for the linear model for residuals vs. predicted values.  
+
+**Outliers:** Given the boxplot, it appears that there are quite a few outliers in the data in terms of residuals.
+
+**Transformation:** Given that the independent variables in this case were all 0 or 1, it was found that most transformations would yield little to no result. However, a log transform of the response variable will result in a slightly better model. The new model is shown below: 
+    
+```{r}
+Model_best2 = lm(log(BoxOfficeGross)~Comedy  + Documentary + Drama + Thriller + MPAAR, data=Movies)
+summary(Model_best2)
+```
+
+c. Submit your suggested least squares regression formula along with a limited number of appropriate graphs that provide justification for your model. Describe why you believe this model is the best.  
 
 The best least squares regression formula is as follows:      
 $$log(BoxOfficeGross) = 17.738 - 0.422(Comedy) - 1.110(Documentary) - 0.800(Drama) - 0.328(Thriller) - 0.445(MPAAR)$$  
-This model is better than the previous model, given a higher coefficient of determination and more normal of a residual distribution.  
+This model is better than the previous model, given a higher coefficient of determination and more normal of a residual distribution.
+
 ```{r}
 plot(Model_best2)
 boxplot(residuals(Model_best2))
 ```
+
 The qq-plot specifically shows normal residual distribution, and the variance of the residuals does not increase given an increase in the predicted value. A boxplot further proves this, given the shape of the boxplot and the fact that there are no outliers.    
 
 d. Test the overall model adequacy.  
 ```{r}
 plot(residuals(Model_best2))
 ```
-Overall, this model is more adequate than the previous one, but that doesn't say much given a very small $R^2$ value, which was 0.1259. Though residuals are now normally distributed, and the residual vs. order plot looks completely randomized, not much of a difference is made in terms of model adequacy.  
 
+Overall, this model is more adequate than the previous one, but that doesn't say much given a very small $R^2$ value, which was 0.1259. Though residuals are now normally distributed, and the residual vs. order plot looks completely randomized, not much of a difference is made in terms of model adequacy.  
 
 3. Conduct an extra sum of squares test to determine if one or more interaction terms (or quadratic terms) should be included in the model. You can choose any other terms to test.  
 $H_0: \beta_6 = \beta_7 = \beta_8 = \beta_9 = 0$  
@@ -125,9 +137,10 @@ $H_a: \text{At least one of the } \beta_i \text{ is not zero.}$
 Model_interaction = lm(log(BoxOfficeGross)~Comedy  + Documentary + Drama + Thriller + MPAAR + Comedy*MPAAR  + Documentary*MPAAR + Drama*MPAAR + Thriller*MPAAR, data=Movies)
 anova(Model_best2, Model_interaction)
 ```
-Given the large p-value, at the .95 level of confidence the null hypothesis is not rejected; thus, there is enough statistical evidence to conclude that interaction terms make no difference to the linear model.  
-It is of note that these interaction terms were used because there can only be interaction between genre and rating; a film can only be one genre and one rating, not several.  
 
+Given the large p-value, at the .95 level of confidence the null hypothesis is not rejected; thus, there is enough statistical evidence to conclude that interaction terms make no difference to the linear model.  
+
+It is of note that these interaction terms were used because there can only be interaction between genre and rating; a film can only be one genre and one rating, not several.  
 
 4. Test whether average run time is the same for different Genre. Clearly show your hypothesis test.
 \vskip 1ex
@@ -135,13 +148,16 @@ Using $H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4 = \mu_5 = \mu_6 = \mu_7 = \mu_8 = \mu_
 ```{r}
 summary(aov(RunTime~Genre, data = Movies))
 ```
-With a p-value of $5.51\times10^{-12}$ we have suffecint evidence to reject the null hypothesis and conclude that the average runtime for differnet movie genres is not the same.
+
+With a p-value of $5.51\times10^{-12}$ we have sufficient evidence to reject the null hypothesis and conclude that the average runtime for differnet movie genres is not the same.
 
 5. Check equality of variance of run time for Genre type.
 \vskip 1ex
 Using Barlett's test with $H_0: \sigma^2_1 = \sigma^2_2 = \sigma^2_3 = \sigma^2_4 = \sigma^2_5 = \sigma^2_6 = \sigma^2_7 = \sigma^2_8 = \sigma^2_9$ and $H_a: \sigma^2_i$ are not all equal.
+
 ```{r}
-Movies2 = Movies[-8,] # We must omit the western movie because it is the only oberservation for that genre.
+Movies2 = Movies[-8,] # We omit western because it is the only oberservation for that genre.
 bartlett.test(RunTime~Genre, data = Movies2)
 ```
-With a p-value of $2.967\times10^{-7}$ we have suffecint evidence to reject the null hypothesis and conclude that the varience in runtime for differnet movie genres is not the same. 
+
+With a p-value of $2.967\times10^{-7}$ we have suffecint evidence to reject the null hypothesis and conclude that the variance in runtime for differnet movie genres is not the same. 
