@@ -103,7 +103,7 @@ b. Look at residual plots and check for heteroskedasticity (unequal variance), m
 c. submit your suggested least squares regression formula along with a limited number of appropriate graphs that provide justification for your model. Describe why you believe this model is the best.  
 
 The best least squares regression formula is as follows:      
-$$log(BoxOfficeGross) = 17.7376 - 0.4223(Comedy) - 1.1104(Documentary) - 0.8001(Drama) - 0.3282(Thriller) - 0.4452(MPAAR)$$  
+$$log(BoxOfficeGross) = 17.738 - 0.422(Comedy) - 1.110(Documentary) - 0.800(Drama) - 0.328(Thriller) - 0.445(MPAAR)$$  
 This model is better than the previous model, given a higher coefficient of determination and more normal of a residual distribution.  
 ```{r}
 plot(Model_best2)
@@ -113,12 +113,21 @@ The qq-plot specifically shows normal residual distribution, and the variance of
 
 d. Test the overall model adequacy.  
 ```{r}
-
+plot(residuals(Model_best2))
 ```
-Overall, this model is more adequate than the previous one, but that doesn't say much given a very small $R^2$ value, which was 0.1259. Though residuals are now normally distributed, not much of a difference is made in terms of model adequacy.
+Overall, this model is more adequate than the previous one, but that doesn't say much given a very small $R^2$ value, which was 0.1259. Though residuals are now normally distributed, and the residual vs. order plot looks completely randomized, not much of a difference is made in terms of model adequacy.  
 
 
-3. Conduct an extra sum of squares test to determine if one or more interaction terms (or quadratic terms) should be included in the model. You can choose any other terms to test.
+3. Conduct an extra sum of squares test to determine if one or more interaction terms (or quadratic terms) should be included in the model. You can choose any other terms to test.  
+$H_0: \beta_6 = \beta_7 = \beta_8 = \beta_9 = 0$  
+$H_a: \text{At least one of the } \beta_i \text{ is not zero.}$  
+```{r}
+Model_interaction = lm(log(BoxOfficeGross)~Comedy  + Documentary + Drama + Thriller + MPAAR + Comedy*MPAAR  + Documentary*MPAAR + Drama*MPAAR + Thriller*MPAAR, data=Movies)
+anova(Model_best2, Model_interaction)
+```
+Given the large p-value, at the .95 level of confidence the null hypothesis is not rejected; thus, there is enough statistical evidence to conclude that interaction terms make no difference to the linear model.  
+It is of note that these interaction terms were used because there can only be interaction between genre and rating; a film can only be one genre and one rating, not several.  
+
 
 4. Test whether average run time is the same for different Genre. Clearly show your hypothesis test.
 \vskip 1ex
